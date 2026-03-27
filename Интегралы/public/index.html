@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вычислительная математика</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1>Вычислительная математика</h1>
+            <nav class="main-nav">
+                <button class="main-nav-btn active" onclick="switchModule('integration')">Численное интегрирование</button>
+                <button class="main-nav-btn" onclick="switchModule('ode')">Дифференциальные уравнения</button>
+            </nav>
+        </header>
+
+        <!-- МОДУЛЬ: ЧИСЛЕННОЕ ИНТЕГРИРОВАНИЕ -->
+        <section id="module-integration" class="module-section active">
+            <h2>Численное интегрирование</h2>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openIntTab('lab1')">Одинарный интеграл</button>
+                <button class="tab-btn" onclick="openIntTab('lab2')">Двойной интеграл</button>
+            </div>
+
+            <!-- ЛАБОРАТОРНАЯ №1 -->
+            <div id="lab1" class="tab-content active">
+                <div class="examples-bar">
+                    <span>Примеры:</span>
+                    <button class="example-pill" onclick="loadIntExample(1)">x² (0..1)</button>
+                    <button class="example-pill" onclick="loadIntExample(2)">sin(x) (0..π)</button>
+                    <button class="example-pill" onclick="loadIntExample(3)">exp(x) (0..1)</button>
+                </div>
+
+                <div class="equation-input">
+                    <label>Функция f(x):</label>
+                    <input type="text" id="int_function" value="x**2">
+                </div>
+
+                <div class="controls">
+                    <label>Метод:
+                        <select id="int_method">
+                            <option value="leftRect">Левые прямоугольники</option>
+                            <option value="rightRect">Правые прямоугольники</option>
+                            <option value="trapezoid">Трапеции</option>
+                            <option value="simpson" selected>Симпсон</option>
+                        </select>
+                    </label>
+                    <label>Алгоритм:
+                        <select id="int_algorithm" onchange="toggleToleranceInput()">
+                            <option value="constant" selected>Постоянный шаг</option>
+                            <option value="variable">Переменный шаг</option>
+                        </select>
+                    </label>
+                    <label>a: <input type="number" id="int_a" value="0" step="0.1"></label>
+                    <label>b: <input type="number" id="int_b" value="1" step="0.1"></label>
+                    <label>n: <input type="number" id="int_n" value="100" min="1"></label>
+                    <label id="int_tol_container" style="display:none;">ε:
+                        <input type="number" id="int_tolerance" value="0.0001" step="0.0001">
+                    </label>
+                    <div class="btn-group">
+                        <button onclick="calculateIntegral()">Вычислить</button>
+                        <button class="secondary-btn" onclick="compareAllMethods()">Сравнить методы</button>
+                    </div>
+                </div>
+
+                <div id="int_resultsSection" class="results hidden">
+                    <div class="analysis-box" id="int_analysis"></div>
+                    <div id="int_resultsTable"></div>
+                    <canvas id="int_chart"></canvas>
+                </div>
+            </div>
+
+            <!-- ЛАБОРАТОРНАЯ №2 -->
+            <div id="lab2" class="tab-content">
+                <div class="examples-bar">
+                    <span>Примеры:</span>
+                    <button class="example-pill" onclick="loadDoubleExample(1)">sin(x+y)</button>
+                    <button class="example-pill" onclick="loadDoubleExample(2)">x*y</button>
+                </div>
+
+                <div class="equation-input">
+                    <label>Функция f(x,y):</label>
+                    <input type="text" id="double_function" value="sin(x + y)">
+                </div>
+
+                <div class="controls full-width-controls">
+                    <label>X [a,b]:
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="double_a" value="0" step="0.1" style="flex:1;">
+                            <input type="number" id="double_b" value="1.5708" step="0.1" style="flex:1;">
+                        </div>
+                    </label>
+                    <label>Y [c,d]:
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="double_c" value="0" step="0.1" style="flex:1;">
+                            <input type="number" id="double_d" value="0.7854" step="0.1" style="flex:1;">
+                        </div>
+                    </label>
+                    <label>Метод (внешний):
+                        <select id="double_method_outer">
+                            <option value="leftRect">Левые прям.</option>
+                            <option value="rightRect">Правые прям.</option>
+                            <option value="trapezoid">Трапеции</option>
+                            <option value="simpson" selected>Симпсон</option>
+                        </select>
+                    </label>
+                    <label>Метод (внутренний):
+                        <select id="double_method_inner">
+                            <option value="leftRect">Левые прям.</option>
+                            <option value="rightRect">Правые прям.</option>
+                            <option value="trapezoid">Трапеции</option>
+                            <option value="simpson" selected>Симпсон</option>
+                        </select>
+                    </label>
+                    <label>nₓ: <input type="number" id="double_nx" value="20" min="1"></label>
+                    <label>nᵧ: <input type="number" id="double_ny" value="20" min="1"></label>
+                    <div class="btn-group">
+                        <button onclick="calculateDoubleIntegral()">Вычислить</button>
+                        <button class="secondary-btn" onclick="compareDoubleMethods()">Сравнить</button>
+                    </div>
+                </div>
+
+                <div id="double_resultsSection" class="results hidden">
+                    <div class="analysis-box" id="double_analysis"></div>
+                    <div id="double_resultsTable"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- МОДУЛЬ: ДИФФЕРЕНЦИАЛЬНЫЕ УРАВНЕНИЯ -->
+        <section id="module-ode" class="module-section">
+            <h2>Дифференциальные уравнения</h2>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openOdeTab('ode1')">1-й порядок</button>
+                <button class="tab-btn" onclick="openOdeTab('ode2')">2-й порядок</button>
+                <button class="tab-btn" onclick="openOdeTab('ode3')">Система</button>
+            </div>
+
+            <div id="ode1" class="tab-content active">
+                <div class="equation-input">
+                    <label>y' = f(x,y):</label>
+                    <input type="text" id="ode1_func" value="y * (1 - x)">
+                </div>
+                <div class="controls">
+                    <label>x₀: <input type="number" id="ode1_x0" value="0"></label>
+                    <label>y₀: <input type="number" id="ode1_y0" value="1"></label>
+                    <label>xₙ: <input type="number" id="ode1_xn" value="1"></label>
+                    <label>h: <input type="number" id="ode1_h" value="0.1" step="0.01"></label>
+                </div>
+                <div class="btn-group">
+                    <button onclick="solveOdeFirstOrder()">Вычислить</button>
+                </div>
+                <div id="ode1_results" class="results hidden">
+                    <div class="analysis-box" id="ode1_analysis"></div>
+                    <div id="ode1_table"></div>
+                    <canvas id="ode1_chart"></canvas>
+                </div>
+            </div>
+
+            <div id="ode2" class="tab-content">
+                <div class="equation-input">
+                    <label>y' = </label><input type="text" id="ode2_f1" value="z" style="width:150px;">
+                    <label>z' = </label><input type="text" id="ode2_f2" value="(-z / x) - y" style="width:150px;">
+                </div>
+                <div class="controls full-width-controls">
+                    <label>x₀: <input type="number" id="ode2_x0" value="1"></label>
+                    <label>y₀: <input type="number" id="ode2_y0" value="0.77"></label>
+                    <label>z₀: <input type="number" id="ode2_z0" value="-0.44"></label>
+                    <label>xₙ: <input type="number" id="ode2_xn" value="1.5"></label>
+                    <label>h: <input type="number" id="ode2_h" value="0.1"></label>
+                </div>
+                <div class="btn-group">
+                    <button onclick="solveOdeSecondOrder()">Вычислить</button>
+                </div>
+                <div id="ode2_results" class="results hidden">
+                    <div class="analysis-box" id="ode2_analysis"></div>
+                    <div id="ode2_table"></div>
+                    <canvas id="ode2_chart"></canvas>
+                </div>
+            </div>
+
+            <div id="ode3" class="tab-content">
+                <div class="equation-input">
+                    <label>dx/dt = </label><input type="text" id="ode3_fx" value="-2*x + 5*z" style="width:150px;">
+                    <label>dy/dt = </label><input type="text" id="ode3_fy" value="sin(t-1)*x - y + 3*z" style="width:150px;">
+                    <label>dz/dt = </label><input type="text" id="ode3_fz" value="-x + 2*z" style="width:150px;">
+                </div>
+                <div class="controls full-width-controls">
+                    <label>t₀: <input type="number" id="ode3_t0" value="0"></label>
+                    <label>x₀: <input type="number" id="ode3_x0" value="2"></label>
+                    <label>y₀: <input type="number" id="ode3_y0" value="1"></label>
+                    <label>z₀: <input type="number" id="ode3_z0" value="1"></label>
+                    <label>tₙ: <input type="number" id="ode3_tn" value="0.3"></label>
+                    <label>h: <input type="number" id="ode3_h" value="0.003"></label>
+                </div>
+                <div class="btn-group">
+                    <button onclick="solveOdeSystem()">Вычислить</button>
+                </div>
+                <div id="ode3_results" class="results hidden">
+                    <div class="analysis-box" id="ode3_analysis"></div>
+                    <div id="ode3_table"></div>
+                    <canvas id="ode3_chart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
